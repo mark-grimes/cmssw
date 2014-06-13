@@ -38,6 +38,13 @@ void HGCalGeometry::newCell( const GlobalPoint& f1 ,
 			     const CCGFloat*    parm ,
 			     const DetId&       detId ) {
   const uint32_t cellIndex (topology().detId2denseGeomId(detId));
+  const int32_t signedCellIndex=cellIndex;
+  if( signedCellIndex==-1 )
+  {
+	  std::cerr << "*** HGCalGeometry::newCell was passed DetId " << detId.rawId() << " which has an invalid cellIndex!!! ***" << std::endl;
+	  return;
+  }
+
   DetId geomId = (detId.subdetId() == HGCEE ? 
 		  (DetId)(HGCEEDetId(detId).geometryCell()) :
 		  (DetId)(HGCHEDetId(detId).geometryCell()));
