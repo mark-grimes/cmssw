@@ -27,4 +27,6 @@
 <use   name="root"/>
 <use   name="rootmath"/>
 <use   name="clhep"/>
-<flags   EDM_PLUGIN="1"/>
+<library   file="*.cc" name="CalibTrackerSiPixelErrorEstimation">
+  <flags   EDM_PLUGIN="1"/>
+</library>

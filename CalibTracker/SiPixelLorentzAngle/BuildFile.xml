@@ -1,4 +1,6 @@
-<flags   EDM_PLUGIN="1"/>
+<library   file="*.cc" name="CalibTrackerSiPixelLorentzAngle">
+  <flags   EDM_PLUGIN="1"/>
+</library>
 <use   name="FWCore/Framework"/>
 <use   name="DataFormats/Common"/>
 <use   name="FWCore/ParameterSet"/>
