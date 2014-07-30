@@ -1,5 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
+# Customise for different running scenarios
+from SLHCUpgradeSimulations.Configuration.eraModifiers_cff import eraPostLS1
+
 simMuonCSCDigis = cms.EDProducer("CSCDigiProducer",
     strips = cms.PSet(
         peakTimeSigma = cms.double(3.0),
@@ -75,6 +78,27 @@ simMuonCSCDigis = cms.EDProducer("CSCDigiProducer",
     digitizeBadChambers = cms.bool(False),
     layersNeeded = cms.uint32(3)
 )
+
+def _modifyCSCDigiForPostLS1( object ) :
+    """
+    CSC digitizer customization 
+    with bunchTimingOffsets tuned to center trigger stubs at bx6
+    when pretrigger with 3 layers and median stub timing are used
+    """
+    ## Make sure there's no bad chambers/channels
+    #object.strips.readBadChambers = True
+    #object.wires.readBadChannels = True
+    #object.digitizeBadChambers = True
+
+    ## Customised timing offsets so that ALCTs and CLCTs times are centered in signal BX. 
+    ## These offsets below were tuned for the case of 3 layer pretriggering 
+    ## and median stub timing algorithm.
+    object.strips.bunchTimingOffsets = cms.vdouble(0.0,
+    	37.53, 37.66, 55.4, 48.2, 54.45, 53.78, 53.38, 54.12, 51.98, 51.28)
+    object.wires.bunchTimingOffsets = cms.vdouble(0.0,
+    	22.88, 22.55, 29.28, 30.0, 30.0, 30.5, 31.0, 29.5, 29.1, 29.88)
+
+eraPostLS1.toModify( simMuonCSCDigis, func=_modifyCSCDigiForPostLS1 )
 
 
 
