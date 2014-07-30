@@ -791,6 +791,8 @@ AnyDirectionAnalyticalPropagator = cms.ESProducer( "AnalyticalPropagatorESProduc
 CSCChannelMapperESProducer = cms.ESProducer( "CSCChannelMapperESProducer",
   AlgoName = cms.string( "CSCChannelMapperStartup" )
 )
+eraPostLS1.toModify( CSCChannelMapperESProducer, AlgoName="CSCChannelMapperPostls1" )
+
 CSCIndexerESProducer = cms.ESProducer( "CSCIndexerESProducer",
   AlgoName = cms.string( "CSCIndexerStartup" )
 )
