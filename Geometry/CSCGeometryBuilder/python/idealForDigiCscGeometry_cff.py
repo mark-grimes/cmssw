@@ -41,3 +41,8 @@ idealForDigiCSCGeometry.alignmentsLabel = 'fakeForIdeal'
 #   Both Globaltag as well as FakeAlignmentSource provide IOV - it is not distinguished to provide IOV for 
 #   a given label only (e.g. 'fakeForIdeal' compared to '').
 # - I'll try to contact framework people for CMSSW_2_2_0 and above.
+
+# Customise for different running scenarios
+from SLHCUpgradeSimulations.Configuration.eraModifiers_cff import eraPostLS1
+
+eraPostLS1.toModify( idealForDigiCSCGeometry, useGangedStripsInME1a=False )

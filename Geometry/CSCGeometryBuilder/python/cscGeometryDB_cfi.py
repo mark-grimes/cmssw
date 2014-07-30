@@ -17,3 +17,8 @@ CSCGeometryESModule = cms.ESProducer("CSCGeometryESModule",
     applyAlignment = cms.bool(True), ## GF: to be abandoned
     useDDD = cms.bool(False)
 )
+
+# Customise for different running scenarios
+from SLHCUpgradeSimulations.Configuration.eraModifiers_cff import eraPostLS1
+
+eraPostLS1.toModify( CSCGeometryESModule, useGangedStripsInME1a=False )
