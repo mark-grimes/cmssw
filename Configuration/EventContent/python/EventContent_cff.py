@@ -92,6 +92,16 @@ from DQMOffline.Configuration.DQMOffline_EventContent_cff import *
 #
 from Configuration.EventContent.AlCaRecoOutput_cff import *
 
+# Customise different event content for different running scenarios
+from SLHCUpgradeSimulations.Configuration.eraModifiers_cff import eraPostLS1
+
+def _modifyEventContentForPostLS1( object ) :
+    """
+    Function that adds the correct collections for post LS1 running to the event content
+    """
+    object.outputCommands.append('keep *_simMuonCSCDigis_*_*')
+    object.outputCommands.append('keep *_simMuonRPCDigis_*_*')
+    object.outputCommands.append('keep *_simHcalUnsuppressedDigis_*_*')
 
 #
 #
@@ -165,6 +175,8 @@ RAWSIMEventContent = cms.PSet(
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize=cms.untracked.int32(5*1024*1024)
 )
+
+eraPostLS1.toModify( RAWSIMEventContent, func=_modifyEventContentForPostLS1 )
 #
 #
 # RAWSIMHLT Data Tier definition
@@ -175,6 +187,8 @@ RAWSIMHLTEventContent = cms.PSet(
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize=cms.untracked.int32(5*1024*1024)
 )
+
+eraPostLS1.toModify( RAWSIMHLTEventContent, func=_modifyEventContentForPostLS1 )
 #
 #
 # RAWRECOSIMHLT Data Tier definition
@@ -215,6 +229,8 @@ GENRAWEventContent = cms.PSet(
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize=cms.untracked.int32(5*1024*1024)
 )
+
+eraPostLS1.toModify( GENRAWEventContent, func=_modifyEventContentForPostLS1 )
 #
 #
 # AODSIM Data Tier definition
@@ -236,6 +252,9 @@ FEVTEventContent = cms.PSet(
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize=cms.untracked.int32(5*1024*1024)
 )
+
+eraPostLS1.toModify( FEVTEventContent, func=_modifyEventContentForPostLS1 )
+
 FEVTHLTALLEventContent = cms.PSet(
     outputCommands = cms.untracked.vstring('drop *'),
     splitLevel = cms.untracked.int32(0),
@@ -283,6 +302,7 @@ FEVTDEBUGEventContent = cms.PSet(
     eventAutoFlushCompressedSize=cms.untracked.int32(5*1024*1024)
 )
 
+eraPostLS1.toModify( FEVTDEBUGEventContent, func=_modifyEventContentForPostLS1 )
 
 #
 #
@@ -295,6 +315,7 @@ FEVTDEBUGHLTEventContent = cms.PSet(
     eventAutoFlushCompressedSize=cms.untracked.int32(5*1024*1024)
 )
 
+eraPostLS1.toModify( FEVTDEBUGHLTEventContent, func=_modifyEventContentForPostLS1 )
 #
 #
 # RECOSIMDEBUG Data Tier definition
