@@ -2,6 +2,9 @@
 
 import FWCore.ParameterSet.Config as cms
 
+# Customise for different running scenarios
+from SLHCUpgradeSimulations.Configuration.eraModifiers_cff import eraPostLS1
+
 
 HLTConfigVersion = cms.PSet(
   tableName = cms.string('/dev/CMSSW_6_2_0/PIon/V24')
@@ -791,6 +794,8 @@ CSCChannelMapperESProducer = cms.ESProducer( "CSCChannelMapperESProducer",
 CSCIndexerESProducer = cms.ESProducer( "CSCIndexerESProducer",
   AlgoName = cms.string( "CSCIndexerStartup" )
 )
+eraPostLS1.toModify( CSCIndexerESProducer, AlgoName="CSCIndexerPostls1" )
+
 CaloTopologyBuilder = cms.ESProducer( "CaloTopologyBuilder" )
 CaloTowerConstituentsMapBuilder = cms.ESProducer( "CaloTowerConstituentsMapBuilder",
   appendToDataLabel = cms.string( "" ),

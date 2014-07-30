@@ -9,3 +9,7 @@ CSCIndexerESProducer = cms.ESProducer("CSCIndexerESProducer",
   AlgoName = cms.string("CSCIndexerStartup")
 )
 
+# Customise for different running scenarios
+from SLHCUpgradeSimulations.Configuration.eraModifiers_cff import eraPostLS1
+
+eraPostLS1.toModify( CSCIndexerESProducer, AlgoName="CSCIndexerPostls1" )
