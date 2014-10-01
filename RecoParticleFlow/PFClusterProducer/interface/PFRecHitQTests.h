@@ -594,7 +594,7 @@ class PFRecHitQTestShashlikTiming : public PFRecHitQTestBase {
 
     bool test(reco::PFRecHit& hit,const EcalRecHit& rh,bool& cleanit) {
       if( useSafetyCuts_ && 
-	  ( rh.timeError() < 1e5 || !rh.isTimeValid() ||
+	  ( rh.timeError() < 1e4 || !rh.isTimeValid() ||
 	    rh.isTimeErrorValid() ) ) {
 	// never clean safe rechits
 	return true;
