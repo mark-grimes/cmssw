@@ -1,0 +1,49 @@
+#ifndef MarksTools_Method2PulseFit_interface_FittedPulse_h
+#define MarksTools_Method2PulseFit_interface_FittedPulse_h
+
+#include <vector>
+#include <cstddef>
+
+//
+// Forward declarations
+//
+class DQMStore;
+namespace FitterFuncs
+{
+	class PulseShapeFunctor;
+}
+
+namespace markstools
+{
+	/** @brief Class to hold all information about a pulse and its fit.
+	 * Used to contain the data while a decision is made about whether to plot it or not, e.g.
+	 * the ten instances with the highest chi2 are stored, then plots made from them at the end
+	 * of the run.
+	 * @author Mark Grimes
+	 * @date 09/Jan/2015
+	 */
+	class FittedPulse
+	{
+		friend class FittedPulsePlots;
+	public:
+		FittedPulse();
+		void setPulse( const std::vector<double>& pulse );
+		void setPreSamples( size_t preSamples );
+		double chi2() const;
+		void setChi2( double chi2 );
+		void setFittedPulse( size_t pulseNumber, double time, double charge );
+		void resetFittedPulses();
+		void setFittedPedestal( double pedestal );
+		void plotAllQuantities( DQMStore* pDQMStore, FitterFuncs::PulseShapeFunctor pulseShapeFunctor ) const;
+	protected:
+		std::vector<double> pulse_;
+		double chi2_;
+		std::vector< std::pair<double,double> > fittedPulses_;
+		double fittedPedestal_;
+		size_t preSamples_; // The number of samples before the triggered bunch crossing
+	};
+
+} // end of namespace markstools
+
+
+#endif
