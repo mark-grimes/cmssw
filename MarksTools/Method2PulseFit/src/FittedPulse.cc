@@ -1,7 +1,6 @@
 #include "MarksTools/Method2PulseFit/interface/FittedPulse.h"
 
 #include <array> // Need this because PulseShapeFitOOTPileupCorrection.h doesn't include it directly
-#include "RecoLocalCalo/HcalRecAlgos/interface/PulseShapeFitOOTPileupCorrection.h"
 #include <FWCore/ServiceRegistry/interface/Service.h>
 #include <DQMServices/Core/interface/DQMStore.h>
 #include <DQMServices/Core/interface/MonitorElement.h>
@@ -50,7 +49,7 @@ void markstools::FittedPulse::setFittedPedestal( double pedestal )
 	fittedPedestal_=pedestal;
 }
 
-void markstools::FittedPulse::plotAllQuantities( DQMStore* pDQMStore, FitterFuncs::PulseShapeFunctor pulseShapeFunctor ) const
+void markstools::FittedPulse::plotAllQuantities( DQMStore* pDQMStore, markstools::FittedPulse::PulseShapeFunction pulseShapeFunction ) const
 {
 	const double binWidth=25;
 	const double lowEdge=-binWidth*(static_cast<double>(preSamples_)+0.5);
@@ -70,7 +69,7 @@ void markstools::FittedPulse::plotAllQuantities( DQMStore* pDQMStore, FitterFunc
 
 		MonitorElement* pFittedPulse=pDQMStore->book1D( "FittedPulse"+std::to_string(pulseIndex), "FittedPulse"+std::to_string(pulseIndex), pulse_.size(), lowEdge, highEdge );
 		std::array<float,HcalConst::maxSamples> result;
-		pulseShapeFunctor.funcHPDShape( result, fittedPulses_[pulseIndex].first, fittedPulses_[pulseIndex].second, 0 );
+		pulseShapeFunction( result, fittedPulses_[pulseIndex].first, fittedPulses_[pulseIndex].second, 0 );
 		for( size_t index=0; index<result.size(); ++index )
 		{
 			pFittedPulse->setBinContent( index+1, result[index] );

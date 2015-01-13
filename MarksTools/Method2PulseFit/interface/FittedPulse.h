@@ -3,15 +3,15 @@
 
 #include <vector>
 #include <cstddef>
+#include <functional>
+
+// Need this include for HcalConst
+#include "RecoLocalCalo/HcalRecAlgos/interface/PulseShapeFitOOTPileupCorrection.h"
 
 //
 // Forward declarations
 //
 class DQMStore;
-namespace FitterFuncs
-{
-	class PulseShapeFunctor;
-}
 
 namespace markstools
 {
@@ -25,6 +25,7 @@ namespace markstools
 	class FittedPulse
 	{
 		friend class FittedPulsePlots;
+		typedef std::function<void(std::array<float,HcalConst::maxSamples>& ntmpbin,const double &pulseTime,const double &pulseHeight,const double &slew)> PulseShapeFunction;
 	public:
 		FittedPulse();
 		void setPulse( const std::vector<double>& pulse );
@@ -34,7 +35,7 @@ namespace markstools
 		void setFittedPulse( size_t pulseNumber, double time, double charge );
 		void resetFittedPulses();
 		void setFittedPedestal( double pedestal );
-		void plotAllQuantities( DQMStore* pDQMStore, FitterFuncs::PulseShapeFunctor pulseShapeFunctor ) const;
+		void plotAllQuantities( DQMStore* pDQMStore, PulseShapeFunction pulseShapeFunction ) const;
 	protected:
 		std::vector<double> pulse_;
 		double chi2_;

@@ -1,6 +1,5 @@
 <use name="root"/>
 <use name="DQMServices/Core"/>
-<use name="RecoLocalCalo/HcalRecAlgos"/>
 <export>
   <lib name="1"/>
 </export>
