@@ -12,6 +12,10 @@
 // Forward declarations
 //
 class DQMStore;
+namespace markstools
+{
+	class PulseFitPlots;
+}
 
 namespace markstools
 {
@@ -24,7 +28,7 @@ namespace markstools
 	 */
 	class FittedPulse
 	{
-		friend class FittedPulsePlots;
+		friend class markstools::PulseFitPlots;
 		typedef std::function<void(std::array<float,HcalConst::maxSamples>& ntmpbin,const double &pulseTime,const double &pulseHeight,const double &slew)> PulseShapeFunction;
 	public:
 		FittedPulse();
@@ -33,6 +37,7 @@ namespace markstools
 		double chi2() const;
 		void setChi2( double chi2 );
 		void setFittedPulse( size_t pulseNumber, double time, double charge );
+		void setChosenPulse( int pulseNumber );
 		void resetFittedPulses();
 		void setFittedPedestal( double pedestal );
 		void plotAllQuantities( DQMStore* pDQMStore, PulseShapeFunction pulseShapeFunction ) const;
@@ -40,6 +45,7 @@ namespace markstools
 		std::vector<double> pulse_;
 		double chi2_;
 		std::vector< std::pair<double,double> > fittedPulses_;
+		int chosenPulse_;
 		double fittedPedestal_;
 		size_t preSamples_; // The number of samples before the triggered bunch crossing
 	};

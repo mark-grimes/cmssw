@@ -6,7 +6,7 @@
 #include <DQMServices/Core/interface/MonitorElement.h>
 
 markstools::FittedPulse::FittedPulse()
-	: chi2_(0), fittedPedestal_(0), preSamples_(0)
+	: chi2_(0), chosenPulse_(-1), fittedPedestal_(0), preSamples_(0)
 {
 	// No operation besides the initialiser list
 }
@@ -37,9 +37,15 @@ void markstools::FittedPulse::setFittedPulse( size_t pulseNumber, double time, d
 	fittedPulses_[pulseNumber]=std::make_pair(time,charge);
 }
 
+void markstools::FittedPulse::setChosenPulse( int pulseNumber )
+{
+	chosenPulse_=pulseNumber;
+}
+
 void markstools::FittedPulse::resetFittedPulses()
 {
 	chi2_=0;
+	chosenPulse_=-1;
 	fittedPedestal_=0;
 	fittedPulses_.clear();
 }
