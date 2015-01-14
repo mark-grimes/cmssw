@@ -17,6 +17,16 @@
 #include "Math/Functor.h"
 
 #include "RecoLocalCalo/HcalRecAlgos/src/HybridMinimizer.h"
+#include "MarksTools/Method2PulseFit/interface/SelfUpdatingList.h"
+
+//
+// Forward declarations
+//
+namespace markstools
+{
+	class PulseFitPlots;
+	class FittedPulse;
+}
 
 namespace HcalConst{
 
@@ -59,7 +69,9 @@ namespace FitterFuncs{
      std::vector<float> acc25nsVec, diff25nsItvlVec;
      std::vector<float> accVarLenIdxZEROVec, diffVarItvlIdxZEROVec;
      std::vector<float> accVarLenIdxMinusOneVec, diffVarItvlIdxMinusOneVec;
+   public:
      void funcHPDShape(std::array<float,HcalConst::maxSamples> & ntmpbin, const double &pulseTime, const double &pulseHeight,const double &slew);
+   private:
      double psFit_x[HcalConst::maxSamples], psFit_y[HcalConst::maxSamples], psFit_erry[HcalConst::maxSamples], psFit_erry2[HcalConst::maxSamples], psFit_slew[HcalConst::maxSamples];
      
      bool pedestalConstraint_;
@@ -95,6 +107,7 @@ public:
     void setPulseShapeTemplate  (const HcalPulseShapes::Shape& ps);
     void resetPulseShapeTemplate(const HcalPulseShapes::Shape& ps);
 
+    void savePlots();
 private:
     int pulseShapeFit(const double * energyArr, const double * pedenArr, const double *chargeArr, 
 		      const double *pedArr, const double *gainArr, const double tsTOTen, std::vector<double> &fitParsVec) const;
@@ -130,6 +143,11 @@ private:
     double pedSig_;
     double noise_;    
     HcalTimeSlew::BiasSetting slewFlavor_;    
+
+    mutable std::vector<markstools::PulseFitPlots> fitPlots_;
+    mutable std::unique_ptr<markstools::FittedPulse> pCurrentPulse_;
+    mutable markstools::SelfUpdatingList<markstools::FittedPulse> pulsesWithHighestChi2_;
+    mutable markstools::SelfUpdatingList<markstools::FittedPulse> pulsesWithLowestChi2_;
 };
 
 #endif // PulseShapeFitOOTPileupCorrection_h

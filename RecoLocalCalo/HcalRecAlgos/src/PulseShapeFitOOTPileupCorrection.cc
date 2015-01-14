@@ -4,6 +4,11 @@
 #include "RecoLocalCalo/HcalRecAlgos/interface/PulseShapeFitOOTPileupCorrection.h"
 #include "FWCore/Utilities/interface/isFinite.h"
 
+#include <FWCore/ServiceRegistry/interface/Service.h>
+#include <DQMServices/Core/interface/DQMStore.h>
+#include "MarksTools/Method2PulseFit/interface/PulseFitPlots.h"
+#include "MarksTools/Method2PulseFit/interface/FittedPulse.h"
+
 namespace FitterFuncs{
 
   //Decalare the Pulse object take it in from Hcal and set some options
@@ -175,9 +180,13 @@ PulseShapeFitOOTPileupCorrection::PulseShapeFitOOTPileupCorrection() : cntsetPul
                                                                        TSMin_(0), TSMax_(0), ts4Chi2_(0), ts3Chi2_(0), ts345Chi2_(0), pedestalConstraint_(0),
                                                                        timeConstraint_(0), addPulseJitter_(0), unConstrainedFit_(0), applyTimeSlew_(0),
                                                                        ts4Min_(0), ts4Max_(0), pulseJitter_(0), timeMean_(0), timeSig_(0), pedMean_(0), pedSig_(0),
-                                                                       noise_(0) {
+                                                                       noise_(0),
+																	   pulsesWithHighestChi2_( 5, [](const markstools::FittedPulse& pulseA,const markstools::FittedPulse& pulseB){return pulseA.chi2()>pulseB.chi2();}, [](const markstools::FittedPulse& pulse){return true;} ),
+																	   pulsesWithLowestChi2_( 5, [](const markstools::FittedPulse& pulseA,const markstools::FittedPulse& pulseB){return pulseA.chi2()<pulseB.chi2();}, [](const markstools::FittedPulse& pulse){return pulse.chi2()!=0;} )
+{
    hybridfitter = new PSFitter::HybridMinimizer(PSFitter::HybridMinimizer::kMigrad);
    iniTimesArr = { {-100,-75,-50,-25,0,25,50,75,100,125} };
+   fitPlots_.emplace_back( edm::Service<DQMStore>().operator->() );
 }
 
 PulseShapeFitOOTPileupCorrection::~PulseShapeFitOOTPileupCorrection() { 
@@ -245,6 +254,9 @@ void PulseShapeFitOOTPileupCorrection::resetPulseShapeTemplate(const HcalPulseSh
 
 void PulseShapeFitOOTPileupCorrection::apply(const CaloSamples & cs, const std::vector<int> & capidvec, const HcalCalibrations & calibs, std::vector<double> & correctedOutput) const
 {
+   pCurrentPulse_.reset( new markstools::FittedPulse );
+   pCurrentPulse_->setPreSamples( cs.presamples() );
+
    psfPtr_->setDefaultcntNANinfit();
 
    const unsigned int cssize = cs.size();
@@ -281,6 +293,34 @@ void PulseShapeFitOOTPileupCorrection::apply(const CaloSamples & cs, const std::
      fitParsVec = {0.001, -9999.};
    }
    correctedOutput.swap(fitParsVec); correctedOutput.push_back(psfPtr_->getcntNANinfit());
+
+   for( auto& plots : fitPlots_ ) plots.fill( *pCurrentPulse_ );
+   pulsesWithHighestChi2_.add( *pCurrentPulse_ );
+   pulsesWithLowestChi2_.add( *pCurrentPulse_ );
+}
+
+void PulseShapeFitOOTPileupCorrection::savePlots()
+{
+   DQMStore* pDQMStore=edm::Service<DQMStore>().operator->();
+
+   auto pulseShapeFunction=std::bind( &FitterFuncs::PulseShapeFunctor::funcHPDShape, psfPtr_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 );
+
+   size_t ranking=0;
+   for( const auto& pulse : pulsesWithHighestChi2_ )
+   {
+      pDQMStore->cd();
+      pDQMStore->setCurrentFolder("/pulseWithHighestChi2_"+std::to_string(ranking));
+      pulse.plotAllQuantities(pDQMStore,pulseShapeFunction);
+      ++ranking;
+   }
+   ranking=0;
+   for( const auto& pulse : pulsesWithLowestChi2_ )
+   {
+      pDQMStore->cd();
+      pDQMStore->setCurrentFolder("/pulseWithLowestChi2_"+std::to_string(ranking));
+      pulse.plotAllQuantities(pDQMStore,pulseShapeFunction);
+      ++ranking;
+   }
 }
 
 constexpr char const* varNames[] = {"time", "energy","time1","energy1","time2","energy2", "ped"};
@@ -311,6 +351,8 @@ int PulseShapeFitOOTPileupCorrection::pulseShapeFit(const double * energyArr, co
    psfPtr_->setpsFiterry2(tmperry2);
    psfPtr_->setpsFitslew (tmpslew);
    
+   pCurrentPulse_->setPulse( std::vector<double>(tmpy,tmpy+HcalConst::maxSamples) );
+
    //Fit 1 single pulse
    float timevalfit  = 0;
    float chargevalfit= 0;
@@ -343,10 +385,14 @@ int PulseShapeFitOOTPileupCorrection::pulseShapeFit(const double * energyArr, co
    fitParsVec.push_back(timevalfit);
    fitParsVec.push_back(pedvalfit);
    fitParsVec.push_back(chi2);
+
+   pCurrentPulse_->setChi2( chi2 );
+
    return outfitStatus;
 }
 
-void PulseShapeFitOOTPileupCorrection::fit(int iFit,float &timevalfit,float &chargevalfit,float &pedvalfit,float &chi2,bool &fitStatus,double &iTSMax,const double &iTSTOTEn,double *iEnArr,int (&iBX)[3]) const { 
+void PulseShapeFitOOTPileupCorrection::fit(int iFit,float &timevalfit,float &chargevalfit,float &pedvalfit,float &chi2,bool &fitStatus,double &iTSMax,const double &iTSTOTEn,double *iEnArr,int (&iBX)[3]) const {
+  pCurrentPulse_->resetFittedPulses();
   int n = 3;
   if(iFit == 2) n = 5; //Two   Pulse Fit 
   if(iFit == 3) n = 7; //Three Pulse Fit 
@@ -417,6 +463,11 @@ void PulseShapeFitOOTPileupCorrection::fit(int iFit,float &timevalfit,float &cha
    }
    assert(results);
 
+   pCurrentPulse_->setFittedPulse( 0, results[0], results[1] );
+   if( n>3 ) pCurrentPulse_->setFittedPulse( 1, results[2], results[3] );
+   if( n>5 ) pCurrentPulse_->setFittedPulse( 2, results[4], results[5] );
+   pCurrentPulse_->setFittedPedestal( results[n-1] );
+
    timevalfit   = results[0];
    chargevalfit = results[1];
    pedvalfit    = results[n-1];
@@ -431,12 +482,15 @@ void PulseShapeFitOOTPileupCorrection::fit(int iFit,float &timevalfit,float &cha
      if((std::abs(timevalfit)<std::abs(timeval2fit)) && (std::abs(timevalfit)<std::abs(timeval3fit))){
       timevalfit   = timevalfit;
       chargevalfit = chargevalfit;
+      pCurrentPulse_->setChosenPulse(0);
      } else if((std::abs(timeval2fit)<std::abs(timevalfit)) && (std::abs(timeval2fit)<std::abs(timeval3fit))){
       timevalfit = timeval2fit;
       chargevalfit = chargeval2fit;
+      pCurrentPulse_->setChosenPulse(1);
      } else if((std::abs(timeval3fit)<std::abs(timevalfit)) && (std::abs(timeval3fit)<std::abs(timeval2fit))){
       timevalfit = timeval3fit;
       chargevalfit = chargeval3fit;
+      pCurrentPulse_->setChosenPulse(2);
      }
    }
 
