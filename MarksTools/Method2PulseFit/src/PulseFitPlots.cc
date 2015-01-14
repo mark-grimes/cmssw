@@ -11,7 +11,7 @@ markstools::PulseFitPlots::PulseFitPlots( DQMStore* pDQMStore )
 	pTimeValFit_=pDQMStore->book1D( "TimeValFit", "TimeValFit", 200, -100, 100 );
 	pPedValFit_=pDQMStore->book1D( "PedValFit", "PedValFit", 200, -1, 5 );
 	pChi2_=pDQMStore->book1D( "Chi2", "Chi2", 200, 0, 22000 );
-	pDeltaTime_=pDQMStore->book2D( "deltaTime", "deltaTime", 50, 0, 100, 50, 0, 100 );
+	pDeltaTime_=pDQMStore->book2D( "deltaTime", "deltaTime", 8, 0, 200, 8, 0, 200 );
 }
 
 markstools::PulseFitPlots::~PulseFitPlots()
