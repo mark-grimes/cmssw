@@ -1,0 +1,10 @@
+<flags CXXFLAGS="-O0 -g -DDEBUG"/>
+<flags ADD_SUBDIR="1"/>
+<use name="root"/>
+<use name="protobuf"/>
+<use name="xerces-c" />
+<use name="DataFormats/L1TCalorimeter"/>
+<include_path path="interface"/>
+<export>
+	<lib name="L1TriggerMenuGeneration"/>
+</export>
