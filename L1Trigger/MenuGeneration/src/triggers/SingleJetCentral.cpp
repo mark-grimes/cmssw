@@ -1,0 +1,135 @@
+#include "SingleJetCentral.h"
+
+
+#include "l1menu/Exceptions.h"
+
+#include "l1menu/TriggerPrimitives.h"
+#include "RegisterTriggerMacro.h"
+#include <DataFormats/L1TCalorimeter/interface/CaloTower.h>
+
+
+namespace l1menu
+{
+	namespace triggers
+	{
+
+		/* The REGISTER_TRIGGER macro will make sure that the given trigger is registered in the
+		 * l1menu::TriggerTable when the program starts. I also want to provide some suggested binning
+		 * however. The REGISTER_TRIGGER_AND_CUSTOMISE macro does exactly the same but lets me pass
+		 * a pointer to a function that will be called directly after the trigger has been registered
+		 * at program startup. The function takes no parameters and returns void. In this case I'm
+		 * giving it a lambda function.
+		 */
+		REGISTER_TRIGGER_AND_CUSTOMISE( SingleJetCentral_v0,
+			[]() // Use a lambda function to customise rather than creating a named function that never gets used again.
+			{
+				l1menu::TriggerTable& triggerTable=l1menu::TriggerTable::instance();
+				SingleJetCentral_v0 tempTriggerInstance;
+				triggerTable.registerSuggestedBinning( tempTriggerInstance.name(), "threshold1", 300, 0, 300 );
+			} // End of customisation lambda function
+		) // End of REGISTER_TRIGGER_AND_CUSTOMISE macro call
+
+
+	} // end of namespace triggers
+
+} // end of namespace l1menu
+
+
+//----------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
+//---------------  Definitions below         ---------------------------------------------
+//----------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
+
+
+bool l1menu::triggers::SingleJetCentral_v0::apply( const l1menu::TriggerPrimitives& event ) const
+{
+	// Original code from CMSSW_6_1_X
+//	const L1Analysis::L1AnalysisDataFormat& analysisDataFormat=event.rawEvent();
+//	const bool* PhysicsBits=event.physicsBits();
+//
+//	bool raw = PhysicsBits[0];  // ZeroBias
+//	if (! raw) return false;
+//
+//	bool ok=false;
+//	int Nj = analysisDataFormat.Njet ;
+//	for (int ue=0; ue < Nj; ue++) {
+//		int bx = analysisDataFormat.Bxjet[ue];
+//		if (bx != 0) continue;
+//		bool isFwdJet = analysisDataFormat.Fwdjet[ue];
+//		if (isFwdJet) continue;
+//		bool isTauJet = analysisDataFormat.Taujet[ue];
+//		if (isTauJet) continue;
+//
+//		float eta = analysisDataFormat.Etajet[ue];
+//		if (eta < regionCut_ || eta > 21.-regionCut_) continue;  // eta = 5 - 16
+//
+//		float rank = analysisDataFormat.Etjet[ue];
+//		float pt = rank; //CorrectedL1JetPtByGCTregions(analysisDataFormat.Etajet[ue],rank*4.,theL1JetCorrection);
+//		if (pt >= threshold1_) ok = true;
+//	}
+//
+//	return ok;
+
+	if( !event.hasCaloTowers() ) throw l1menu::DataNotAvailableException( name()+" v"+std::to_string(version())+" - called on event with no CaloTowers", __FILE__, __LINE__ );
+
+	for( size_t jetIndex=0; jetIndex<event.caloTowersSize(); ++jetIndex )
+	{
+		const l1t::CaloTower& tower=event.caloTowerAt(jetIndex);
+
+		if( std::abs(tower.eta()) > etaCut_ ) continue;
+		if( tower.et() < threshold1_ ) continue;
+
+		// If control got this far then the jet passed all cuts. Since we only
+		// require a single jet we know the event passes, so cut out early.
+		return true;
+	}
+
+	// If control got this far then none of the jets passed the cuts.
+	return false;
+}
+
+bool l1menu::triggers::SingleJetCentral_v0::thresholdsAreCorrelated() const
+{
+	return false;
+}
+
+unsigned int l1menu::triggers::SingleJetCentral_v0::version() const
+{
+	return 0;
+}
+
+l1menu::triggers::SingleJetCentral::SingleJetCentral()
+	: threshold1_(20), etaCut_(3)
+{
+	// No operation other than the initialiser list
+}
+
+const std::string l1menu::triggers::SingleJetCentral::name() const
+{
+	return "L1_SingleJetC";
+}
+
+const std::vector<std::string> l1menu::triggers::SingleJetCentral::parameterNames() const
+{
+	std::vector<std::string> returnValue;
+	returnValue.push_back("threshold1");
+	returnValue.push_back("etaCut");
+	return returnValue;
+}
+
+float& l1menu::triggers::SingleJetCentral::parameter( const std::string& parameterName )
+{
+	if( parameterName=="threshold1" ) return threshold1_;
+	else if( parameterName=="etaCut" ) return etaCut_;
+	else throw l1menu::InvalidArgumentException( "Not a valid parameter name (\""+parameterName+"\") for "+name(), __FILE__, __LINE__ );
+}
+
+const float& l1menu::triggers::SingleJetCentral::parameter( const std::string& parameterName ) const
+{
+	if( parameterName=="threshold1" ) return threshold1_;
+	else if( parameterName=="etaCut" ) return etaCut_;
+	else throw l1menu::InvalidArgumentException( "Not a valid parameter name (\""+parameterName+"\") for "+name(), __FILE__, __LINE__ );
+}
