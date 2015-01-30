@@ -29,7 +29,7 @@ protected:
 
 #include <cppunit/config/SourcePrefix.h>
 #include "l1menu/tools/stringManipulation.h"
-#include <stdexcept>
+#include "l1menu/Exceptions.h"
 #include <cmath>
 
 CPPUNIT_TEST_SUITE_REGISTRATION(StringManipulationUnitTestSuite);
@@ -67,6 +67,6 @@ void StringManipulationUnitTestSuite::testConvertStringToFloat()
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( 9, l1menu::tools::convertStringToFloat("9"), 0 );
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( 34.039298, l1menu::tools::convertStringToFloat("34.039298"), std::pow(10,-5) );
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( -123.12131, l1menu::tools::convertStringToFloat("-123.12131"), std::pow(10,-5) );
-	CPPUNIT_ASSERT_THROW( l1menu::tools::convertStringToFloat("To the pub!"), std::runtime_error );
-	CPPUNIT_ASSERT_THROW( l1menu::tools::convertStringToFloat("12 blah"), std::runtime_error );
+	CPPUNIT_ASSERT_THROW( l1menu::tools::convertStringToFloat("To the pub!"), l1menu::InvalidArgumentException );
+	CPPUNIT_ASSERT_THROW( l1menu::tools::convertStringToFloat("12 blah"), l1menu::InvalidArgumentException );
 }
