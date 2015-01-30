@@ -8,6 +8,8 @@
 l1menu::menufileformats::XMLMenuFileReader::XMLMenuFileReader( const std::string& filename )
 {
 	inputFile_.parseFromFile(filename);
+	// Make some checks to make sure the file is in the valid format
+	if( inputFile_.rootElement().name()!="l1menu" ) throw l1menu::IncorrectFileFormatException( "Root XML element is not name 'l1menu'", __FILE__, __LINE__ );
 }
 
 l1menu::menufileformats::XMLMenuFileReader::~XMLMenuFileReader()
