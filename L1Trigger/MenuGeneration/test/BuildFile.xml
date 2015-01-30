@@ -3,4 +3,5 @@
 <include_path path="../interface"/>
 <bin name="L1Trigger_MenuGeneration_unitTests" file="unitTestsMain.cpp,unitTestSuites/*UnitTestSuite.cpp">
 	<use name="cppunit"/>
+	<use name="FWCore/ParameterSet"/>
 </bin>
