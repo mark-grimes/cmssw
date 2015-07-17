@@ -1,4 +1,6 @@
 import FWCore.ParameterSet.Config as cms
+from SimTracker.Configuration.Eras import eras as SimTracker
+from RecoTracker.Configuration.Eras import eras as RecoTracker
 
 class Eras (object):
     """
@@ -17,7 +19,10 @@ class Eras (object):
         self.Run2_25ns = cms.ModifierChain( self.run2_common, self.run2_25ns_specific, self.stage1L1Trigger )
         self.Run2_50ns = cms.ModifierChain( self.run2_common, self.run2_50ns_specific )
         self.Run2_HI = cms.ModifierChain( self.run2_common, self.run2_HI_specific, self.stage1L1Trigger )
-        
+
+        # Upgrade eras
+        self.Phase1_2017 = cms.ModifierChain( self.Run2_25ns, SimTracker.phase1_2017, RecoTracker.phase1_2017 )
+
         # The only thing this collection is used for is for cmsDriver to
         # warn the user if they specify an era that is discouraged from being
         # set directly. It also stops these eras being printed in the error
