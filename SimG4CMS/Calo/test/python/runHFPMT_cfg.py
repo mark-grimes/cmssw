@@ -10,6 +10,8 @@ process.load("Geometry.CMSCommonData.cmsHFPMTAverageXML_cfi")
 #process.load("SimG4CMS.Calo.cmsHFPMTXML_cfi")
 
 process.load("Geometry.TrackerNumberingBuilder.trackerNumberingGeometry_cfi")
+process.load("Geometry.HcalCommonData.hcalParameters_cfi")
+process.load("Geometry.HcalCommonData.hcalDDDSimConstants_cfi")
 
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 
