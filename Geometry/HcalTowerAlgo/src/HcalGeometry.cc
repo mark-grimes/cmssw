@@ -81,7 +81,7 @@ DetId HcalGeometry::getClosestCell(const GlobalPoint& r) const {
 
   // Now find the closest eta_bin, eta value of a bin i is average
   // of eta[i] and eta[i-1]
-  static const double z_long=1115.0;
+  static const double z_long=1100.0;
   double abseta = fabs(r.eta());
   double absz   = fabs(r.z());
   
