@@ -24,6 +24,7 @@
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 #include "Geometry/HcalCommonData/interface/HcalDDDRecConstants.h"
 #include "Geometry/HcalTowerAlgo/interface/HcalFlexiHardcodeGeometryLoader.h"
+#include "Geometry/HcalTowerAlgo/interface/HcalHardcodeGeometryLoader.h"
 #include "Geometry/HcalTowerAlgo/interface/HcalGeometry.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
@@ -42,7 +43,7 @@ class HcalTopology;
 //
 
 HcalHardcodeGeometryEP::HcalHardcodeGeometryEP( const edm::ParameterSet& ps ) : ps0(ps) {
-  
+  useOld_ = ps.getParameter<bool>("UseOldLoader");
   //the following line is needed to tell the framework what
   // data is being produced
   setWhatProduced( this,
@@ -73,8 +74,13 @@ HcalHardcodeGeometryEP::produceIdeal( const HcalRecNumberingRecord& iRecord ) {
    iRecord.get( hcons ) ;
    edm::ESHandle<HcalTopology> topology ;
    iRecord.get( topology ) ;
-   HcalFlexiHardcodeGeometryLoader loader(ps0);
-   return ReturnType (loader.load (*topology, *hcons));
+   if (useOld_) {
+     HcalHardcodeGeometryLoader loader(ps0);
+     return ReturnType (loader.load (*topology));
+   } else {
+      HcalFlexiHardcodeGeometryLoader loader(ps0);
+     return ReturnType (loader.load (*topology, *hcons));
+   }
 }
 
 HcalHardcodeGeometryEP::ReturnType

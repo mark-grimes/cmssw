@@ -8,6 +8,7 @@
 #include "Geometry/CaloGeometry/interface/CaloCellGeometry.h"
 #include "Geometry/HcalTowerAlgo/interface/HcalGeometry.h"
 #include "Geometry/HcalTowerAlgo/interface/HcalFlexiHardcodeGeometryLoader.h"
+#include "Geometry/HcalTowerAlgo/interface/HcalHardcodeGeometryLoader.h"
 #include "Geometry/HcalTowerAlgo/interface/HcalTrigTowerGeometry.h"
 #include "DataFormats/HcalDetId/interface/HcalTrigTowerDetId.h"
 #include <iostream>
@@ -35,11 +36,13 @@ private:
 
   edm::ParameterSet ps0;
   std::string m_label;
+  bool        useOld_;
 };
 
 HcalGeometryTester::HcalGeometryTester( const edm::ParameterSet& iConfig ) :
   ps0(iConfig),  m_label("_master") {
   m_label = iConfig.getParameter<std::string>( "HCALGeometryLabel" );
+  useOld_ = iConfig.getParameter<bool>( "UseOldLoader" );
 }
 
 HcalGeometryTester::~HcalGeometryTester() { }
@@ -53,8 +56,14 @@ void HcalGeometryTester::analyze(const edm::Event& /*iEvent*/,
   edm::ESHandle<HcalTopology> topologyHandle;
   iSetup.get<HcalRecNumberingRecord>().get(topologyHandle);
   const HcalTopology topology = (*topologyHandle);
-  HcalFlexiHardcodeGeometryLoader m_loader(ps0);
-  CaloSubdetectorGeometry* geom = m_loader.load(topology, hcons);
+  CaloSubdetectorGeometry* geom(0);
+  if (useOld_) {
+    HcalHardcodeGeometryLoader m_loader(ps0);
+    geom = m_loader.load(topology);
+  } else {
+    HcalFlexiHardcodeGeometryLoader m_loader(ps0);
+    geom = m_loader.load(topology, hcons);
+  }
 
   testValidDetIds(geom, topology, DetId::Hcal, HcalBarrel,  " BARREL ");
   testValidDetIds(geom, topology, DetId::Hcal, HcalEndcap,  " ENDCAP ");

@@ -29,5 +29,6 @@ public:
 
 private:
   edm::ParameterSet ps0;
+  bool              useOld_;
 };
 #endif
