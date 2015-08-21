@@ -1,5 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
+# Use this object to make changes specific to the running conditions
+from Configuration.StandardSequences.Eras import eras
+
 import SimTracker.TrackAssociatorProducers.trackAssociatorByChi2_cfi 
 from SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi import *
 from SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi import *
@@ -14,6 +17,43 @@ from SimTracker.VertexAssociation.VertexAssociatorByPositionAndTracks_cfi import
 from PhysicsTools.RecoAlgos.trackingParticleSelector_cfi import trackingParticleSelector as _trackingParticleSelector
 from CommonTools.RecoAlgos.sortedPrimaryVertices_cfi import sortedPrimaryVertices as _sortedPrimaryVertices
 from CommonTools.RecoAlgos.recoChargedRefCandidateToTrackRefProducer_cfi import recoChargedRefCandidateToTrackRefProducer as _recoChargedRefCandidateToTrackRefProducer
+
+#
+# These are examples of the different ways you can make FastSim specific changes
+#
+# ** Two important point **
+#
+# 1) These changes are currently overridden by TrackValidation_fastsim_cff. If you implement
+#    these changes you should remove them from there.
+# 2) It's probably much better to make these changes in the
+#    SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi file.
+#
+
+# This is the simplest way where only one member is changed
+eras.fastSim.toModify( quickTrackAssociatorByHits, associateStrip = False )
+# Note: you can specify the type if you want, i.e. "associateStrip = cms.bool(False)". I generally
+# prefer not to because you'll get a type error if you accidentally type the wrong parameter name.
+
+# This way can be used when lots of changes need to be made, and it's
+# easier to group everything in one function.
+def functionToModify( objectToChange ):
+    objectToChange.associatePixel = False
+
+eras.fastSim.toModify( quickTrackAssociatorByHits, functionToModify )
+
+# This way is rarely used, but the more I think about it I think it's the most
+# intuitive and flexible. The syntax of the two above is mostly historical because
+# eras were originally implemented by storing all the changes and then only applying
+# at the end. These was really, really hard to do in practice though, so they were
+# switched to just applying the changes immediately.
+# I need to talk to Chris Jones if there are any downsides with this syntax, but I
+# can't think of any.
+#
+# This way is also required if you want to check more than one era. E.g.
+#     if eras.fastSim.isChosen() and if eras.Run2_25ns.isChosen() :
+if eras.fastSim.isChosen() :
+    quickTrackAssociatorByHits.useClusterTPAssociation = False
+
 
 ## Track selectors
 # Validation iterative steps
