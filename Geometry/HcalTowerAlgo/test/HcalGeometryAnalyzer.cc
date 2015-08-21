@@ -6,6 +6,7 @@
 #include "Geometry/HcalTowerAlgo/interface/HcalGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloCellGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/HcalTowerAlgo/interface/HcalFlexiHardcodeGeometryLoader.h"
 #include <iostream>
 
 class HcalGeometryAnalyzer : public edm::one::EDAnalyzer<> 
@@ -19,11 +20,13 @@ public:
   void endJob() override {}
 
 private:
+  const HcalFlexiHardcodeGeometryLoader& m_loader;
   std::string m_label;
 };
 
 HcalGeometryAnalyzer::HcalGeometryAnalyzer( const edm::ParameterSet& iConfig ) 
-    : m_label("_master")
+    : m_loader( iConfig ),
+      m_label("_master")
 {
     m_label = iConfig.getParameter<std::string>( "HCALGeometryLabel" );
 }
@@ -35,7 +38,7 @@ void
 HcalGeometryAnalyzer::analyze( const edm::Event& /*iEvent*/, const edm::EventSetup& iSetup )
 {
     edm::ESHandle<HcalTopology> topologyHandle;
-    iSetup.get<IdealGeometryRecord>().get( topologyHandle );
+    iSetup.get<HcalRecNumberingRecord>().get( topologyHandle );
     const HcalTopology* topology ( topologyHandle.product() ) ;
 
     edm::ESHandle<CaloSubdetectorGeometry> pG;

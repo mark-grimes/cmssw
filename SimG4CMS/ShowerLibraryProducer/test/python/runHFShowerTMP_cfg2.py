@@ -7,6 +7,8 @@ process.load("IOMC.EventVertexGenerators.VtxSmearedGauss_cfi")
 
 #process.load("Geometry.HcalCommonData.hcalforwardshowerLong_cfi")
 process.load("SimG4CMS.ShowerLibraryProducer.hcalforwardshower_cfi")
+process.load("Geometry.HcalCommonData.hcalParameters_cfi")
+process.load("Geometry.HcalCommonData.hcalDDDSimConstants_cfi")
 process.load("SimG4Core.Application.g4SimHits_cfi")
 
 process.MessageLogger = cms.Service("MessageLogger",

@@ -5,6 +5,8 @@ process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("IOMC.EventVertexGenerators.VtxSmearedGauss_cfi")
 process.load("Geometry.CMSCommonData.ecalhcalGeometryXML_cfi")
 process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Geometry.HcalCommonData.hcalParameters_cfi")
+process.load("Geometry.HcalCommonData.hcalDDDSimConstants_cfi")
 process.load("Configuration.EventContent.EventContent_cff")
 process.load("SimG4Core.Application.g4SimHits_cfi")
 
