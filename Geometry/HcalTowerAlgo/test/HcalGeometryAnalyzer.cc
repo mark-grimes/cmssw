@@ -1,4 +1,4 @@
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -9,17 +9,19 @@
 #include "Geometry/HcalTowerAlgo/interface/HcalFlexiHardcodeGeometryLoader.h"
 #include <iostream>
 
-class HcalGeometryAnalyzer : public edm::EDAnalyzer 
+class HcalGeometryAnalyzer : public edm::one::EDAnalyzer<> 
 {
 public:
-    explicit HcalGeometryAnalyzer( const edm::ParameterSet& );
-    ~HcalGeometryAnalyzer( void );
+  explicit HcalGeometryAnalyzer( const edm::ParameterSet& );
+  ~HcalGeometryAnalyzer( void );
     
-    virtual void analyze( const edm::Event&, const edm::EventSetup& );
+  void beginJob() override {}
+  void analyze(edm::Event const& iEvent, edm::EventSetup const&) override;
+  void endJob() override {}
 
 private:
-    const HcalFlexiHardcodeGeometryLoader& m_loader;
-    std::string m_label;
+  const HcalFlexiHardcodeGeometryLoader& m_loader;
+  std::string m_label;
 };
 
 HcalGeometryAnalyzer::HcalGeometryAnalyzer( const edm::ParameterSet& iConfig ) 
