@@ -29,10 +29,14 @@ class Eras (object):
         self.Run2_50ns = cms.ModifierChain( self.run2_common, self.run2_50ns_specific, self.stage1L1Trigger )
         self.Run2_HI = cms.ModifierChain( self.run2_common, self.run2_HI_specific, self.stage1L1Trigger )
         
+        #
         # Upgrade eras
-        # This era is temporary until a full scenario is working in 7XY. It contains only muon changes
-        # and no upgrade calorimeters.
-        self.Run3_muonDev = cms.ModifierChain( SimMuon.phase2, RecoMuon.phase2 )
+        #
+        
+        # This era is temporary until a full scenario is working in 7XY. It's based on Run 2 but contains
+        # Phase 2 muon upgrades. There are no upgrade calorimeters since they're not working in 7XY yet.
+        # TODO - remove this era once there is a full Run3 era working.
+        self.Run3_muonDev = cms.ModifierChain( self.Run2_25ns, SimMuon.phase2, RecoMuon.phase2 )
 
         # The only thing this collection is used for is for cmsDriver to
         # warn the user if they specify an era that is discouraged from being
