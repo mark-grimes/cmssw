@@ -13,6 +13,7 @@ class Eras (object):
         self.run2_HI_specific = cms.Modifier()
         self.stage1L1Trigger = cms.Modifier()
         self.stage2L1Trigger = cms.Modifier()
+        self.phase1Pixel = cms.Modifier()
         
         # This era should not be set by the user with the "--era" command, it's
         # activated automatically if the "--fast" command is used.
@@ -30,6 +31,10 @@ class Eras (object):
         self.Run2_HI = cms.ModifierChain( self.run2_common, self.run2_HI_specific, self.stage1L1Trigger )
         # Future Run 2 scenarios.
         self.Run2_2016 = cms.ModifierChain( self.run2_common, self.run2_25ns_specific, self.stage2L1Trigger )
+        self.Run2_2017 = cms.ModifierChain( self.Run2_2016, self.phase1Pixel )
+        # Scenarios further afield.
+        # Phase2Dev is everything for the 2023 (2026?) detector that works so far in this release.
+        self.Phase2Dev = cms.Modifier()
         
         # The only thing this collection is used for is for cmsDriver to
         # warn the user if they specify an era that is discouraged from being
