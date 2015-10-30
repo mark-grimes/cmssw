@@ -73,7 +73,6 @@ def _modifyPixelDigitizerForPhase1Pixel( digitizer ) :
     digitizer.thePixelChipEfficiency_FPix3 = cms.double(0.999)
     # something broken in the configs above - turn off for now
     digitizer.AddPixelInefficiency = cms.bool(False)
-    print "Applying phase 1 changes"
 
 def _modifyPixelDigitizerForPhase1PixelWithPileup( processObject ) :
     """
@@ -84,7 +83,6 @@ def _modifyPixelDigitizerForPhase1PixelWithPileup( processObject ) :
     with a <era>.makeProcessModifier() command, since it can only be applied
     at the end because the number of pileup interactions is not known yet.
     """
-    print "Applying phase 1 changes for pileup"
     if hasattr(processObject,'mix'): 
         n=0
         if hasattr(processObject.mix,'input'):
